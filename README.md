@@ -19,6 +19,12 @@ functionality. This is different than other entity systems
 that are strictly component-based.
 
 
+Project Status
+------------------------------------------------------------
+
+Unstable; in development.
+
+
 Summary
 ------------------------------------------------------------
 
