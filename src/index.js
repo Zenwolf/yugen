@@ -6,16 +6,16 @@
 
 define(
     [
-    	'./attribute',
-    	'./evented-attribute',
+        './attribute',
+        './evented-attribute',
         './entity'
-	],
+    ],
 
-	function (attr, eventedAttr, entity) {
-		return {
-			attr       : attr,
-			eventedAttr: eventedAttr,
+    function (attr, eventedAttr, entity) {
+        return {
+            attr       : attr,
+            eventedAttr: eventedAttr,
             entity     : entity
-		};
-	}
+        };
+    }
 );
