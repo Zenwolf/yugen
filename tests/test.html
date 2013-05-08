@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+<title>Yugen Test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="utf-8">
+
+</head>
+<body>
+
+<script src="./require.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+require.config({
+    baseUrl: '../src/',
+    map: {
+        '*': {
+            './': '../src/',
+            'kokou/emitter': '../../kokou/src/emitter',
+            'kokou/table': '../../kokou/src/table'
+        },
+    }
+});
+
+</script>
+
+<script type="text/javascript">
+
+require(['../src/index'], function (yugen) {
+    // vanilla attribute
+    window.a = yugen.attr.create();
+
+    a.initAttr({
+        name : 'foo',
+        value: 7
+    });
+
+    // evented attribute
+    window.ea = yugen.eventedAttr.create({
+        name : 'zot',
+        value: 42
+    });
+
+    ea.addListener('value', function (e) {
+        console.log('old value: ' + e.oldVal);
+        console.log('new value: ' + e.newVal);
+    });
+
+    ea.addListener('terminate', function (e) {
+        console.log('zot terminated');
+    });
+
+    ea.setVal( a.getVal() );
+
+    window.e = yugen.entity.create({});
+    e.addAttr(a);
+    e.addEventedAttr(ea);
+    e.setAttrVal('zot', 32);
+    console.log( e.getAttrVal('zot') );
+    e.removeEventedAttr('zot');
+});
+</script>
+
+</body>
+</html>
