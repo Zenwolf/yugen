@@ -93,6 +93,10 @@ require(['../src/index'], function (yugen) {
     e3.addReceiver(e4);
     e3.addReceiver(e5);
 
+    e3.addAttrListener('bgcolor', 'VALUE_CHANGE', function (e) {
+        console.log('SUPER DUPER COLOR CHANGE!');
+    }, null, true);
+
     e3.set('bgcolor', 'green');
 });
 </script>

@@ -90,7 +90,7 @@ function (type, emitter, table, eventedAttr, behavior) {
         function removeAttr(attrName) {
             var attr = this.data.attrs.remove(attrName);
 
-            if ( type.isFunction(attr['removeListener']) ) {
+            if ( attr && type.isFunction(attr['removeListener']) ) {
                 attr.removeListener(eventedAttr.EVENT_VALUE_CHANGE,
                     this.data.boundHandleAttrEvent, this, false);
             }
@@ -103,6 +103,7 @@ function (type, emitter, table, eventedAttr, behavior) {
             var behaviors = this.data.behaviors;
             var name = behavior.getName();
             var b = behaviors.get( name );
+
             if ( b !== undefined ) { return false; } // didn't add it again.
             behaviors.put( name, behavior );
             return true;                             // added it
@@ -111,13 +112,16 @@ function (type, emitter, table, eventedAttr, behavior) {
         function removeBehavior(name) {
             var behaviors = this.data.behaviors;
             var b = behaviors.remove( name );
+
             if (b) { b.terminateBehavior(); }
             return b;
         }
 
         function addReceiver(entity) {
             var receivers = this.data.receivers;
+
             if ( receivers.indexOf(entity) > -1 ) { return false; }
+
             receivers.push(entity);
 
             this.data.emitter.addListener(EVENT_ENTITY,
@@ -130,10 +134,13 @@ function (type, emitter, table, eventedAttr, behavior) {
             var receivers = this.data.receivers;
             var index = receivers.indexOf(entity);
             var receiver = null;
+
             if ( index > -1 ) { receiver = receivers.splice(index, 1)[0]; }
 
-            this.data.emitter.removeListener(EVENT_ENTITY,
-                entity.data.boundHandleEntityEvent, entity, false);
+            if (receiver) {
+                this.data.emitter.removeListener(EVENT_ENTITY,
+                    receiver.data.boundHandleEntityEvent, receiver, false);
+            }
 
             return receiver;
         }
@@ -179,6 +186,7 @@ function (type, emitter, table, eventedAttr, behavior) {
         }
 
         function handleAttrEvent(e) {
+            var entity = this;
             var entityEvent = {
                 type: EVENT_ENTITY,
                 id: this.data.entityId,
@@ -188,7 +196,10 @@ function (type, emitter, table, eventedAttr, behavior) {
             console.log('entity :: ' + this.data.entityId + ' :: handleAttrEvent');
             console.log(e);
 
-            this.data.emitter.emit(entityEvent.type, entityEvent);
+            // Make sure other local attr listeners go first before entities.
+            setTimeout(function () {
+                entity.data.emitter.emit(entityEvent.type, entityEvent);
+            }, 4);
         }
 
         function handleEntityEvent(e) {
