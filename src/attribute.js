@@ -41,18 +41,15 @@ define(function () {
          * Initialize the object with the correct local properties.
          */
         function initAttr(config) {
-            var aData = null;
             config = config || {};
-
             this.data = this.data || {};
-            aData = this.data['attr'] = {};
 
-            aData.name           = config.name       || 'defaultAttrName';
-            aData.value          = config.value      || 'defaultAttrValue';
-            aData.isValidationOn = config.validation || false;
+            this.data.name           = config.name       || 'defaultAttrName';
+            this.data.value          = config.value      || 'defaultAttrValue';
+            this.data.isValidationOn = config.validate   || false;
 
             // Id is a combination of name and instantiation count.
-            aData.id = aData.name + '-' + (objCount += 1);
+            this.data.id = this.data.name + '-' + (objCount += 1);
 
             return this;
         }
@@ -62,7 +59,7 @@ define(function () {
         }
 
         function getName() {
-            return this.data['attr'].name;
+            return this.data.name;
         }
 
         /*
@@ -80,7 +77,7 @@ define(function () {
         }
 
         function getVal() {
-            return this.data['attr'].value;
+            return this.data.value;
         }
 
         /*
@@ -90,7 +87,7 @@ define(function () {
          * as opposed to [false, null].
          */
         function setVal(value) {
-            var data   = this.data['attr'];
+            var data   = this.data;
             var oldVal = data.value;
             var result = [false, null];
 

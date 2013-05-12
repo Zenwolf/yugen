@@ -19,7 +19,8 @@ require.config({
         '*': {
             './': '../src/',
             'kokou/emitter': '../../kokou/src/emitter',
-            'kokou/table': '../../kokou/src/table'
+            'kokou/table': '../../kokou/src/table',
+            'kokou/type': '../../kokou/src/type'
         },
     }
 });
@@ -56,10 +57,43 @@ require(['../src/index'], function (yugen) {
 
     window.e = yugen.entity.create({});
     e.addAttr(a);
-    e.addEventedAttr(ea);
-    e.setAttrVal('zot', 32);
-    console.log( e.getAttrVal('zot') );
-    e.removeEventedAttr('zot');
+    e.addAttr(ea);
+    e.set('zot', 32);
+    console.log( e.get('zot') );
+    e.removeAttr('zot');
+
+    window.e2 = yugen.entity.create({
+        entityId: 'eid-dark',
+        attrs: [{
+            name: 'health',
+            value: 100,
+            validate: false
+        }, {
+            name: 'speed',
+            value: 2,
+            validate: false
+        }]
+    });
+
+    window.e3 = yugen.entity.create({
+        entityId: 'e3',
+        attrs: [{ name: 'bgcolor', value: '#eef' }]
+    });
+
+    window.e4 = yugen.entity.create({
+        entityId: 'e4',
+        attrs: [{ name: 'bgcolor', value: '#eef' }]
+    });
+
+    window.e5 = yugen.entity.create({
+        entityId: 'e5',
+        attrs: [{ name: 'bgcolor', value: '#eef' }]
+    });
+
+    e3.addReceiver(e4);
+    e3.addReceiver(e5);
+
+    e3.set('bgcolor', 'green');
 });
 </script>
 

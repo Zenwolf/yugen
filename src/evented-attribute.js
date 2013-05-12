@@ -12,6 +12,7 @@ define(['kokou/emitter', './attribute'], function (emitter, attr) {
     var module      = {};            // public module
     var eProto      = Object.getPrototypeOf(eventedAttr);
 
+    var EVENT_VALUE_CHANGE = 'VALUE_CHANGE';
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Prototypical object.
@@ -26,8 +27,11 @@ define(['kokou/emitter', './attribute'], function (emitter, attr) {
      */
     eventedAttr.setVal = function (value) {
         var result = eProto.setVal.call(this, value);
+
         if ( result[0] === true ) {
-            this.emit('value', {
+            this.emit(EVENT_VALUE_CHANGE, {
+                type: EVENT_VALUE_CHANGE,
+                name  : this.data.name,
                 oldVal: result[1],
                 newVal: value
             });
@@ -59,6 +63,7 @@ define(['kokou/emitter', './attribute'], function (emitter, attr) {
     }
 
     module.create = create;
+    module.EVENT_VALUE_CHANGE = EVENT_VALUE_CHANGE;
 
     return module;
 });

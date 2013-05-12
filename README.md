@@ -145,22 +145,3 @@ functionality, such as: initAttr, initEmitter, etc. This
 allows you to create a factory function to do a specific
 initialization, or allows the end user to manually init
 each functionality separately.
-
-The data for each mixin is stored in a specific data property
-so that there will be very few conflicts. This also allows
-mixins to use the same property names if they want.
-
-_Example_:
-
-```javascript
-myObj.data['attr'].foo
-myObj.data['emitter'].foo
-```
-
-Each mixin creates its own entry in the common data object.
-
-_Functions:_ Currently, functions are not namespaced like
-the properties are. I found that in the case of function
-name conflicts, I usually break the object into multiple
-objects. However, I may revisit this and try out namespaced
-functions in the future.
