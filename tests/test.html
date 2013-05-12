@@ -52,7 +52,7 @@ require(['kokou', '../src/index'], function (kokou, yugen) {
         console.log('new value: ' + e.newVal);
     });
 
-    ea.addListener('terminate', function (e) {
+    ea.addListener(yugen.eventedAttr.EVENT_TERMINATE, function (e) {
         console.log('zot terminated');
     });
 
