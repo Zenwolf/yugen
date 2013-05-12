@@ -18,10 +18,12 @@ require.config({
     map: {
         '*': {
             './': '../src/',
+            'kokou': '../../kokou/src/index',
             'kokou/emitter': '../../kokou/src/emitter',
             'kokou/table': '../../kokou/src/table',
             'kokou/sorted-table': '../../kokou/src/sorted-table',
-            'kokou/type': '../../kokou/src/type'
+            'kokou/type': '../../kokou/src/type',
+            'kokou/advice': '../../kokou/src/advice'
         },
     }
 });
@@ -30,7 +32,7 @@ require.config({
 
 <script type="text/javascript">
 
-require(['../src/index'], function (yugen) {
+require(['kokou', '../src/index'], function (kokou, yugen) {
     // vanilla attribute
     window.a = yugen.attr.create();
 
@@ -103,6 +105,8 @@ require(['../src/index'], function (yugen) {
     window.ereg = yugen.entity.registry;
     window.breg = yugen.behavior.registry;
     window.areg = yugen.attr.registry;
+
+    window.kokou = kokou;
 });
 </script>
 
