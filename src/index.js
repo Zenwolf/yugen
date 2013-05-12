@@ -8,13 +8,15 @@ define(
     [
         './attribute',
         './evented-attribute',
+        './behavior',
         './entity'
     ],
 
-    function (attr, eventedAttr, entity) {
+    function (attr, eventedAttr, behavior, entity) {
         return {
             attr       : attr,
             eventedAttr: eventedAttr,
+            behavior   : behavior,
             entity     : entity
         };
     }

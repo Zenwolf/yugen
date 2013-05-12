@@ -26,10 +26,11 @@
  * 2. If you want event functionality then see evented-attribute.js.
  *
  */
-define(function () {
-    var module   = {}; // public module
-    var attr     = {};   // attribute prototypical object.
-    var objCount = 0;
+define(['./registry'], function (registry) {
+    var module       = {}; // public module
+    var attr         = {};   // attribute prototypical object.
+    var objCount     = 0;
+    var attrRegistry = registry.create().initRegistry();
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,6 +51,8 @@ define(function () {
 
             // Id is a combination of name and instantiation count.
             this.data.id = this.data.name + '-' + (objCount += 1);
+
+            attrRegistry.add( this.data.id, this );
 
             return this;
         }
@@ -144,8 +147,9 @@ define(function () {
     // Public module.
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    module.create      = create;      // factory function.
-    module.asAttribute = asAttribute; // Make the mixin available.
+    module.create      = create;       // factory function.
+    module.asAttribute = asAttribute;  // Make the mixin available.
+    module.registry    = attrRegistry; // registry of all attributes.
 
     return module;
 });

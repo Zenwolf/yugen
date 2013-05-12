@@ -20,6 +20,7 @@ require.config({
             './': '../src/',
             'kokou/emitter': '../../kokou/src/emitter',
             'kokou/table': '../../kokou/src/table',
+            'kokou/sorted-table': '../../kokou/src/sorted-table',
             'kokou/type': '../../kokou/src/type'
         },
     }
@@ -98,6 +99,10 @@ require(['../src/index'], function (yugen) {
     }, null, true);
 
     e3.set('bgcolor', 'green');
+
+    window.ereg = yugen.entity.registry;
+    window.breg = yugen.behavior.registry;
+    window.areg = yugen.attr.registry;
 });
 </script>
 

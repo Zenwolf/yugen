@@ -7,15 +7,28 @@
 /**
  * An evented version of an attribute.
  */
-define(['kokou/emitter', './attribute'], function (emitter, attr) {
-    var eventedAttr = attr.create(); // prototypical object
-    var module      = {};            // public module
-    var eProto      = Object.getPrototypeOf(eventedAttr);
+define(['kokou/emitter', './attribute'],
+function (emitter, attr) {
 
-    var EVENT_VALUE_CHANGE = 'VALUE_CHANGE';
+    var eventedAttr   = attr.create(); // prototype object
+    var module        = {};            // public module
+    var eProto        = Object.getPrototypeOf(eventedAttr);
+
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Prototypical object.
+    // Events.
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    var events = {
+
+        EVENT_VALUE_CHANGE: 'VALUE_CHANGE',
+        EVENT_TERMINATE   : 'TERMINATE'
+
+    };
+
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Prototype object.
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Add emitter functionality to our prototypical attr object.
@@ -29,8 +42,8 @@ define(['kokou/emitter', './attribute'], function (emitter, attr) {
         var result = eProto.setVal.call(this, value);
 
         if ( result[0] === true ) {
-            this.emit(EVENT_VALUE_CHANGE, {
-                type: EVENT_VALUE_CHANGE,
+            this.emit( events.EVENT_VALUE_CHANGE, {
+                type: events.EVENT_VALUE_CHANGE,
                 name  : this.data.name,
                 oldVal: result[1],
                 newVal: value
@@ -39,7 +52,12 @@ define(['kokou/emitter', './attribute'], function (emitter, attr) {
     };
 
     eventedAttr.terminateAttr = function () {
-        this.emit('terminate', {});
+        this.emit( events.EVENT_TERMINATE, {
+            type: events.EVENT_TERMINATE,
+            name: this.data.name,
+            val : this.data.value
+        } );
+
         this.clearListeners();
     };
 
@@ -62,8 +80,16 @@ define(['kokou/emitter', './attribute'], function (emitter, attr) {
         return obj;
     }
 
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Public module.
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     module.create = create;
-    module.EVENT_VALUE_CHANGE = EVENT_VALUE_CHANGE;
+
+    Object.keys(events).forEach(function (key) {
+        module[key] = events[key];
+    });
 
     return module;
 });

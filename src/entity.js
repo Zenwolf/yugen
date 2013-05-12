@@ -13,14 +13,25 @@ define([ 'kokou/type'
        , 'kokou/table'
        , './evented-attribute'
        , './behavior'
+       , './registry'
        ],
-function (type, emitter, table, eventedAttr, behavior) {
+function (type, emitter, table, eventedAttr, behavior, registry) {
 
-    var entity = {};
-    var module = {};
-    var count  = 0;
+    var entity         = {};
+    var module         = {};
+    var count          = 0;
+    var entityRegistry = registry.create().initRegistry();
 
-    var EVENT_ENTITY = 'ENTITY';
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Events.
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    var events = {
+
+        EVENT_ENTITY: 'ENTITY'
+
+    };
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,22 +41,20 @@ function (type, emitter, table, eventedAttr, behavior) {
     var asEntity = (function () {
 
         function initEntity(config) {
-            config        = config    || {};
-            this.data     = this.data || {};
+            var data = this.data = this.data || {};
 
-            if ( this.data.isEntityInit === true ) { return; }
+            config = config || {};
 
-            this.data.entityId  = config.entityId  || ('eid-' + (count += 1));
-            this.data.emitter   = config.emitter   || emitter.create({});
-            this.data.receivers = config.receivers || [];
-            this.data.attrs     = table.create({});
-            this.data.behaviors = table.create({});
+            if ( data.isEntityInit === true ) { return; }
 
-            this.data.boundHandleEntityEvent =
-                this.handleEntityEvent.bind(this);
+            data.entityId  = config.entityId  || ('eid-' + (count += 1));
+            data.emitter   = config.emitter   || emitter.create({});
+            data.receivers = config.receivers || [];
+            data.attrs     = table.create({});
+            data.behaviors = table.create({});
 
-            this.data.boundHandleAttrEvent =
-                this.handleAttrEvent.bind(this);
+            data.boundHandleEntityEvent = this.handleEntityEvent.bind(this);
+            data.boundHandleAttrEvent   = this.handleAttrEvent.bind(this);
 
             // If there are attr configs, create attrs from them.
             if ( config.attrs ) {
@@ -61,7 +70,9 @@ function (type, emitter, table, eventedAttr, behavior) {
                 }, this);
             }
 
-            this.data.isEntityInit = true;
+            entityRegistry.add( this.data.entityId, this );
+
+            data.isEntityInit = true;
         }
 
         function get(attrName) {
@@ -74,7 +85,9 @@ function (type, emitter, table, eventedAttr, behavior) {
         function set(attrName, val) {
             var attr = this.data.attrs.get(attrName);
             var result;
+
             if (attr) { result = attr.setVal(val); }
+
             return result;
         }
 
@@ -96,6 +109,7 @@ function (type, emitter, table, eventedAttr, behavior) {
             }
 
             if (attr) { attr.terminateAttr(); }
+
             return attr;
         }
 
@@ -106,6 +120,7 @@ function (type, emitter, table, eventedAttr, behavior) {
 
             if ( b !== undefined ) { return false; } // didn't add it again.
             behaviors.put( name, behavior );
+
             return true;                             // added it
         }
 
@@ -114,6 +129,7 @@ function (type, emitter, table, eventedAttr, behavior) {
             var b = behaviors.remove( name );
 
             if (b) { b.terminateBehavior(); }
+
             return b;
         }
 
@@ -124,7 +140,7 @@ function (type, emitter, table, eventedAttr, behavior) {
 
             receivers.push(entity);
 
-            this.data.emitter.addListener(EVENT_ENTITY,
+            this.data.emitter.addListener( events.EVENT_ENTITY,
                 entity.data.boundHandleEntityEvent, entity, false);
 
             return true; // added it
@@ -138,24 +154,32 @@ function (type, emitter, table, eventedAttr, behavior) {
             if ( index > -1 ) { receiver = receivers.splice(index, 1)[0]; }
 
             if (receiver) {
-                this.data.emitter.removeListener(EVENT_ENTITY,
+                this.data.emitter.removeListener( events.EVENT_ENTITY,
                     receiver.data.boundHandleEntityEvent, receiver, false);
             }
 
             return receiver;
         }
 
-        function addAttrListener(attrName, eventName, callback, context, isOnce) {
+        function addAttrListener(
+            attrName, eventName, callback, context, isOnce) {
+
             var attr = this.data.attrs.get( attrName );
+
             if ( attr === undefined ) { return false; }
             attr.addListener(eventName, callback, context, isOnce);
+
             return true;
         }
 
-        function removeAttrListener(attrName, eventName, callback, context, isOnce) {
+        function removeAttrListener(
+            attrName, eventName, callback, context, isOnce) {
+
             var attr = this.data.attrs.get( attrName );
+
             if ( attr === undefined ) { return false; }
             attr.removeListener(eventName, callback, context, isOnce);
+
             return true;
         }
 
@@ -188,7 +212,7 @@ function (type, emitter, table, eventedAttr, behavior) {
         function handleAttrEvent(e) {
             var entity = this;
             var entityEvent = {
-                type: EVENT_ENTITY,
+                type: events.EVENT_ENTITY,
                 id: this.data.entityId,
                 e: e
             };
@@ -255,8 +279,18 @@ function (type, emitter, table, eventedAttr, behavior) {
         return obj;
     }
 
-    module.create   = create;   // factory
-    module.asEntity = asEntity; // mixin
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Public module.
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    module.create   = create;         // factory function.
+    module.asEntity = asEntity;       // entity mixin.
+    module.registry = entityRegistry; // registry of all entities.
+
+    Object.keys(events).forEach(function (key) {
+        module[key] = events[key];
+    });
 
     return module;
 });
